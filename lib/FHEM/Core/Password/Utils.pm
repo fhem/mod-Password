@@ -18,6 +18,7 @@ BEGIN {
             setKeyValue
             getKeyValue
             getUniqueId
+            defs
           )
     );
 }
@@ -48,7 +49,6 @@ our %EXPORT_TAGS = (
 sub new {
     my $class = shift;
     my $self  = {
-                  hash  => undef,
                   name  => undef,
                 };
 
@@ -57,9 +57,11 @@ sub new {
 }
 
 sub setStorePassword {
-    my ($self,$hash,$name,$password)    = @_;
+    my $self        = shift;
+    my $name        = shift;
+    my $password    = shift;
 
-    my $index   = $hash->{TYPE} . '_' . $name . '_passwd';
+    my $index   = $defs{$name}->{TYPE} . '_' . $name . '_passwd';
     my $key     = getUniqueId() . $index;
     my $enc_pwd = '';
 
@@ -84,19 +86,19 @@ sub setStorePassword {
 }
 
 sub setDeletePassword {
-    my $hash = shift;
+    my $self = shift;
+    my $name = shift;
 
-    setKeyValue( $hash->{TYPE} . '_' . $hash->{NAME} . '_passwd', undef );
+    setKeyValue( $defs{$name}->{TYPE} . '_' . $name . '_passwd', undef );
 
     return;
 }
 
 sub getReadPassword {
     my $self    = shift;
-    my $hash    = shift;
     my $name    = shift;
 
-    my $index   = $hash->{TYPE} . '_' . $name . '_passwd';
+    my $index   = $defs{$name}->{TYPE} . '_' . $name . '_passwd';
     my $key     = getUniqueId() . $index;
     my ( $password, $err );
 
@@ -135,19 +137,17 @@ qq{GardenaSmartBridge ($name) - unable to read password from file: $err});
         Log3($name, 3, qq{GardenaSmartBridge ($name) - No password in file});
         return undef;
     }
-
-    return;
 }
 
 sub setRename {
-    my $self    = shift;
-    my $new     = shift;
-    my $old     = shift;
+    my $self        = shift;
+    my $newname     = shift;
+    my $oldname     = shift;
 
-    my $hash    = $defs{$new};
+    my $hash    = $defs{$newname};
 
-    setStorePassword( $hash, $new, getReadPassword( $hash, $old ) );
-    setKeyValue( $hash->{TYPE} . '_' . $old . '_passwd', undef );
+    setStorePassword( $hash, $newname, getReadPassword( $hash, $oldname ) );
+    setKeyValue( $hash->{TYPE} . '_' . $oldname . '_passwd', undef );   # remove old password value
 
     return;
 }
@@ -165,14 +165,26 @@ FHEM::Core::Password::Utils - FHEM extension for password handling
 
 This document describes FHEM::Core::Password::Utils version 0.3
 
+=head1 CONSTRUCTOR
+
+FHEM::Core::Password::Utils->new();
+
 =head1 SYNOPSIS
+
   use FHEM::Core::Password::Utils qw(:ALL);
-
-  our $passutil = FHEM::Core::Password::Utils->new();
-
+  our $passwd = FHEM::Core::Password::Utils->new();
   
+  you can also save the password object in the instance hash
+  our $hash->{helper}->{passwdobj} = FHEM::Core::Password::Utils->new();
 
 =head1 DESCRIPTION
+
+Store new Password
+$hash->{helper}->{passwdobj}->setStorePassword('PASSWORD');
+
+Read Password
+$hash->{helper}->{passwdobj}->getReadPassword();
+
 
 
 
@@ -180,13 +192,6 @@ This document describes FHEM::Core::Password::Utils version 0.3
 
 The following functions are exported by this module: 
 C<setStorePassword>,C<setDeletePassword>, C<getReadPassword>, C<setRename>
-
-=head1 FUNCTIONS
-Store new Password
-$passutils->setStorePassword('PASSWORD');
-
-Read Password
-$passutils->getReadPassword();
 
 =over 4
 
