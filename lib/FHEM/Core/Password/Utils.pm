@@ -81,7 +81,7 @@ sub setStorePassword {
     my $err; 
     $err = setKeyValue( $index, $enc_pwd );
 
-    return(0)
+    return(undef,$err)
       if ( defined($err) );
 
     return(1);
@@ -94,7 +94,7 @@ sub setDeletePassword {
     my $err; 
     $err = setKeyValue( $defs{$name}->{TYPE} . '_' . $name . '_passwd', undef );
 
-    return(0)
+    return(undef,$err)
       if ( defined($err) );
 
     return(1);
@@ -117,7 +117,7 @@ sub getReadPassword {
         Log3($name, 4,
 qq{password Keystore handle for Device ($name) - unable to read password from file: $err});
 
-        return undef;
+        return (undef,$err);
     }
 
     if ( defined($password) ) {
@@ -150,15 +150,19 @@ sub setRename {
     my $newname     = shift;
     my $oldname     = shift;
 
-    my $hash    = $defs{$newname};
-
-    return(0)
-    if ( !defined(getReadPassword( $hash, $oldname ))
-      or !defined(setStorePassword( $hash, $newname, getReadPassword( $hash, $oldname ) ) )
-    )
+    my ($resp,$err);
     
-    return(0)
-    if ( defined(setKeyValue( $hash->{TYPE} . '_' . $oldname . '_passwd', undef )) );   # remove old password value
+    ($resp,$err) = $self->setStorePassword($newname,$self->getReadPassword($oldname));     # set new password value
+    return(0,$err)
+      if ( !defined($resp)
+       and defined($err)
+      );
+    
+    ($resp,$err) = $self->setDeletePassword($oldname);     # remove old password value
+    return(0,$err)
+      if ( !defined($resp)
+       and defined($err)
+      );
 
     return(1);
 }
