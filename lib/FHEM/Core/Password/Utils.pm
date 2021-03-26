@@ -78,20 +78,26 @@ sub setStorePassword {
         $key = $encode . $key;
     }
 
-    my $err = setKeyValue( $index, $enc_pwd );
-    return qq{error while saving the password - $err}
+    my $err; 
+    $err = setKeyValue( $index, $enc_pwd );
+
+    return(0)
       if ( defined($err) );
 
-    return q{password successfully saved};
+    return(1);
 }
 
 sub setDeletePassword {
     my $self = shift;
     my $name = shift;
 
-    setKeyValue( $defs{$name}->{TYPE} . '_' . $name . '_passwd', undef );
+    my $err; 
+    $err = setKeyValue( $defs{$name}->{TYPE} . '_' . $name . '_passwd', undef );
 
-    return;
+    return(0)
+      if ( defined($err) );
+
+    return(1);
 }
 
 sub getReadPassword {
@@ -102,14 +108,14 @@ sub getReadPassword {
     my $key     = getUniqueId() . $index;
     my ( $password, $err );
 
-    Log3($name, 4, qq{GardenaSmartBridge ($name) - Read password from file});
+    Log3($name, 4, qq{password Keystore handle for Device ($name) - Read password from file});
 
     ( $err, $password ) = getKeyValue($index);
 
     if ( defined($err) ) {
 
-        Log3($name, 3,
-qq{GardenaSmartBridge ($name) - unable to read password from file: $err});
+        Log3($name, 4,
+qq{password Keystore handle for Device ($name) - unable to read password from file: $err});
 
         return undef;
     }
@@ -134,7 +140,7 @@ qq{GardenaSmartBridge ($name) - unable to read password from file: $err});
     }
     else {
 
-        Log3($name, 3, qq{GardenaSmartBridge ($name) - No password in file});
+        Log3($name, 4, qq{password Keystore handle for Device ($name) - No password in file});
         return undef;
     }
 }
@@ -146,10 +152,15 @@ sub setRename {
 
     my $hash    = $defs{$newname};
 
-    setStorePassword( $hash, $newname, getReadPassword( $hash, $oldname ) );
-    setKeyValue( $hash->{TYPE} . '_' . $oldname . '_passwd', undef );   # remove old password value
+    return(0)
+    if ( !defined(getReadPassword( $hash, $oldname ))
+      or !defined(setStorePassword( $hash, $newname, getReadPassword( $hash, $oldname ) ) )
+    )
+    
+    return(0)
+    if ( defined(setKeyValue( $hash->{TYPE} . '_' . $oldname . '_passwd', undef )) );   # remove old password value
 
-    return;
+    return(1);
 }
 
 1;
