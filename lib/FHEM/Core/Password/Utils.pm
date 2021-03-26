@@ -71,7 +71,7 @@ sub setStorePassword {
         $key .= Digest::MD5::md5_hex($key);
     }
 
-    for my $char ( split /q{}/, $password ) {
+    for my $char ( split //, $password ) {
 
         my $encode = chop($key);
         $enc_pwd .= sprintf( "%.2x", ord($char) ^ ord($encode) );
