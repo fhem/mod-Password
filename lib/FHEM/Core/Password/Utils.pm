@@ -49,8 +49,17 @@ our %EXPORT_TAGS = (
 sub new {
     my $class = shift;
     my $self  = {
-                  name  => undef,
+                  name              => undef,
+                  allowed_haveSha   => undef,
                 };
+                
+    eval { require Digest::SHA; };
+    if($@) {
+        Log3( $hash, 4, qq{password utils: Digest::SHA not found $@});
+        $self->{allowed_haveSha} = 0;
+    } else {
+        $self->{allowed_haveSha} = 1;
+    }
 
     bless $self, $class;
     return $self;
@@ -65,6 +74,38 @@ sub setStorePassword {
     my $key     = getUniqueId() . $index;
     my $enc_pwd = '';
 
+    
+    
+    
+    
+    
+    
+    
+    my $plain = ($a[1] eq "basicAuth" ? "$a[2]:$a[3]" : $a[2]);
+    my ($x,$y) = gettimeofday();
+    my $salt = substr(sprintf("%08X", rand($y)*rand($x)),0,8);
+
+    CommandAttr($hash->{CL}, "$a[0] $a[1] SHA256:$salt:".
+                           Digest::SHA::sha256_base64("$salt:$plain"));
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     if ( eval q{use Digest::MD5;1} ) {
 
         $key = Digest::MD5::md5_hex( unpack "H*", $key );
