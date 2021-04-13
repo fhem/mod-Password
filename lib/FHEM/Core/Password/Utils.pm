@@ -33,17 +33,7 @@ our @EXPORT_OK = qw(
                      getReadPassword
                      setRename
 );
-our %EXPORT_TAGS = (
-    ALL => [
-        qw(
-            new
-            setStorePassword
-            setDeletePassword
-            getReadPassword
-            setRename
-          )
-    ],
-);
+our %EXPORT_TAGS = (ALL => [@EXPORT_OK]);
 
 
 sub new {
