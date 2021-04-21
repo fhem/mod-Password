@@ -42,9 +42,9 @@ sub new {
 sub setStorePassword {
     my $self        = shift;
     my $name        = shift;
-    my $password    = shift;
+    my $password    = shift // return(undef,q{no password given});
 
-    my $index   = $::defs{$name}->{TYPE} . '_' . $name . '_passwd';
+    my $index   = $::defs{$name}->{TYPE} . '_' . $name . '_passkey';
     my ($x,$y)  = ::gettimeofday();
     my $salt    = substr(sprintf("%08X", rand($y)*rand($x)),0,8);
     my $key     = ::getUniqueId() . $index . $salt;
@@ -77,7 +77,7 @@ sub setDeletePassword {
     my $name = shift;
 
     my $err; 
-    $err = ::setKeyValue( $::defs{$name}->{TYPE} . '_' . $name . '_passwd', undef );
+    $err = ::setKeyValue( $::defs{$name}->{TYPE} . '_' . $name . '_passkey', undef );
 
     return(undef,$err)
       if ( defined($err) );
@@ -89,7 +89,7 @@ sub getReadPassword {
     my $self    = shift;
     my $name    = shift;
 
-    my $index   = $::defs{$name}->{TYPE} . '_' . $name . '_passwd';
+    my $index   = $::defs{$name}->{TYPE} . '_' . $name . '_passkey';
     my ( $password, $err, $salt );
 
     ::Log3($name, 4, qq{password Keystore handle for Device ($name) - Read password from file});
@@ -98,10 +98,10 @@ sub getReadPassword {
 
     if ( defined($err) ) {
 
-        ::Log3($name, 4,
+        ::Log3($name, 1,
 qq{password Keystore handle for Device ($name) - unable to read password from file: $err});
 
-        return (undef,$err);
+        return undef;
     }
 
     if (  defined($password)
@@ -131,7 +131,7 @@ qq{password Keystore handle for Device ($name) - unable to read password from fi
     }
     else {
 
-        ::Log3($name, 4, qq{password Keystore handle for Device ($name) - No password in file});
+        ::Log3($name, 1, qq{password Keystore handle for Device ($name) - No password in file});
         return undef;
     }
 }
