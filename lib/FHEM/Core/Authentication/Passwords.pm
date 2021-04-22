@@ -213,13 +213,16 @@ FHEM::Core::Authentication::Passwords->new();
 =head1 DESCRIPTION
 
 Store new Password
-$hash->{helper}->{passwdobj}->setStorePassword('PASSWORD');
+$hash->{helper}->{passwdobj}->setStorePassword($name,'PASSWORD');
 
 Read Password
-$hash->{helper}->{passwdobj}->getReadPassword();
+$hash->{helper}->{passwdobj}->getReadPassword($name);
 
+Delete Password
+$hash->{helper}->{passwdobj}->setDeletePassword($name);
 
-
+Rename Password
+$hash->{helper}->{passwdobj}->getRename($newname,$oldname);
 
 =head1 EXPORT
 

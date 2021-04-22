@@ -4,9 +4,9 @@ use File::Basename;
 use POSIX qw(strftime);
 use strict;
 
-my @filenames = ('lib/FHEM/Core/Password/Utils.pm');
+my @filenames = ('lib/FHEM/Core/Authentication/Passwords.pm');
 
-my $controlsfile    = 'controls_passwordUtils.txt';
+my $controlsfile    = 'controls_authenticationPassword.txt';
 
 open(FH, ">$controlsfile") || return("Can't open $controlsfile: $!");
 
