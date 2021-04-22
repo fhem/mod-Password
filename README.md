@@ -1,7 +1,7 @@
-# FHEM::Core::Password::Utils
+# FHEM::Core::Authentication::Passwords
 
 ## Used branching model
-* Master branch: Production version (copy of [fhem/fhem-mirror/blob/master/fhem/lib/FHEM/Core/Password/Utils.pm](https://github.com/fhem/fhem-mirror/blob/master/fhem/lib/FHEM/Core/Password/Utils.pm))
+* Master branch: Production version (copy of [fhem/fhem-mirror/blob/master/fhem/lib/FHEM/Core/Authentication/Passwords.pm](https://github.com/fhem/fhem-mirror/blob/master/fhem/lib/FHEM/Core/Authentication/Passwords.pm))
 * Devel branch: Latest development version
 
 ## Community support
